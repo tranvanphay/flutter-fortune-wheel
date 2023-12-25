@@ -71,17 +71,27 @@ class _FortuneWheelBackgroundState extends State<FortuneWheelBackground>
     _rotation = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _rotation = Tween(begin: 0.0, end: 360.0).animate(_rotation);
 
-    return Container(
-      color: widget.backgroundColor,
-      child: CustomPaint(
-        painter: _BackgroundPainter(
-          painterController: _painterController,
-          rotateAngle: _rotation.value,
-          anglePerTriangle: 100,
-          numberTriangle: 10,
+    // return Container(
+    //   color: widget.backgroundColor,
+    //   child: CustomPaint(
+    //     painter: _BackgroundPainter(
+    //       painterController: _painterController,
+    //       rotateAngle: _rotation.value,
+    //       anglePerTriangle: 100,
+    //       numberTriangle: 10,
+    //     ),
+    //     child: widget.child,
+    //   ),
+    // );
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(
+          'assets/new_year_bg.jpeg',
+          fit: BoxFit.fill,
         ),
-        child: widget.child,
-      ),
+        Positioned(bottom: 150, left: 0, right: 0, child: widget.child)
+      ],
     );
   }
 }
@@ -94,14 +104,14 @@ class BackgroundPainterController extends ChangeNotifier {
   List<double> noiseSizes = [];
 
   void reset() {
-    noisePoints.clear();
-    noiseSizes.clear();
-    isInit = false;
+    // noisePoints.clear();
+    // noiseSizes.clear();
+    // isInit = false;
   }
 
   void playAnimation() {
-    isPlay = true;
-    notifyListeners();
+    // isPlay = true;
+    // notifyListeners();
   }
 }
 

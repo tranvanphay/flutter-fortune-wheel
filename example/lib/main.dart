@@ -69,18 +69,15 @@ class _MyAppState extends State<MyApp> {
         children: [
           FortuneWheelBackground(
             painterController: _painterController,
-            child: Center(child: _buildFortuneWheel()),
+            child: _buildFortuneWheel(),
           ),
-          Align(
-            alignment: Alignment.topLeft,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  child: _buildResultIsChange(),
-                ),
-              ],
+          Positioned(
+            bottom: 70,
+            left: 0,
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: _buildResultIsChange(),
             ),
           ),
         ],
