@@ -83,58 +83,63 @@ class _FortuneWheelState extends State<FortuneWheel>
     final deviceSize = MediaQuery.of(context).size;
     final meanSize = (deviceSize.width + deviceSize.height) / 2;
     final panFactor = 6 / meanSize;
-    return PanAwareBuilder(
-      physics: CircularPanPhysics(),
-      onFling: widget.wheel.isSpinByPriority
-          ? _handleSpinByPriorityPressed
-          : _handleSpinByRandomPressed,
-      builder: (BuildContext context, PanState panState) {
-        final panAngle = panState.distance * panFactor;
-        return Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            AnimatedBuilder(
-              animation: _wheelAnimation,
-              child: BoardView(
-                items: widget.wheel.items,
-                size: wheelSize,
-              ),
-              builder: (context, child) {
-                ///Rotation angle of the wheel
-                final angle = _wheelAnimation.value * _angle;
-                if (_wheelAnimationController.isAnimating) {
-                  _indexResult = _getIndexFortune(angle + _currentAngle);
-                  widget.onChanged.call(widget.wheel.items[_indexResult]);
-                }
-                final rotationAngle =
-                    2 * pi * widget.wheel.rotationCount * _wheelAnimation.value;
-
-                ///Current angle position of the standing wheel
-                final current = _currentAngle + rotationAngle + panAngle;
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Transform.rotate(
-                      angle: angle + current,
-                      child: child,
-                    ),
-                    _buildCenterOfWheel(),
-                    _buildButtonSpin(),
-                  ],
-                );
-              },
-            ),
-            SizedBox(
-              height: wheelSize,
-              width: wheelSize,
-              child: Align(
-                alignment: const Alignment(1.08, 0),
-                child: widget.wheel.arrowView ?? const ArrowView(),
-              ),
-            ),
-          ],
-        );
+    return InkWell(
+      onTap: () {
+        _handleSpinByPriorityPressed();
       },
+      child: PanAwareBuilder(
+        physics: CircularPanPhysics(),
+        onFling: _handleSpinByPriorityPressed,
+        builder: (BuildContext context, PanState panState) {
+          final panAngle = panState.distance * panFactor;
+          return Stack(
+            alignment: Alignment.center,
+            children: <Widget>[
+              AnimatedBuilder(
+                animation: _wheelAnimation,
+                child: BoardView(
+                  items: widget.wheel.items,
+                  size: wheelSize,
+                ),
+                builder: (context, child) {
+                  ///Rotation angle of the wheel
+                  final angle = _wheelAnimation.value * _angle;
+                  if (_wheelAnimationController.isAnimating) {
+                    _indexResult = _getIndexFortune(angle + _currentAngle);
+                    widget.onChanged.call(widget.wheel.items[_indexResult]);
+                  }
+                  final rotationAngle = 2 *
+                      pi *
+                      widget.wheel.rotationCount *
+                      _wheelAnimation.value;
+
+                  ///Current angle position of the standing wheel
+                  final current = _currentAngle + rotationAngle + panAngle;
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Transform.rotate(
+                        angle: angle + current,
+                        child: child,
+                      ),
+                      _buildCenterOfWheel(),
+                      // _buildButtonSpin(),
+                    ],
+                  );
+                },
+              ),
+              SizedBox(
+                height: wheelSize,
+                width: wheelSize,
+                child: Align(
+                  alignment: Alignment.center, //const Alignment(1.25, 0), //
+                  child: widget.wheel.arrowView ?? const ArrowView(),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -144,48 +149,24 @@ class _FortuneWheelState extends State<FortuneWheel>
   }
 
   ///UI Button Spin
-  Widget _buildButtonSpin() {
-    return Visibility(
-      visible: !_wheelAnimationController.isAnimating,
-      child: widget.wheel.action ??
-          TextButton(
-            onPressed: widget.wheel.isSpinByPriority
-                ? _handleSpinByPriorityPressed
-                : _handleSpinByRandomPressed,
-            style: widget.wheel.spinButtonStyle ??
-                TextButton.styleFrom(
-                  backgroundColor: Colors.black.withOpacity(0.4),
-                ),
-            child: widget.wheel.childSpinButton ??
-                Text(
-                  widget.wheel.titleSpinButton ?? 'Click here to spin',
-                  style: const TextStyle(fontSize: 16, color: Colors.white),
-                ),
-          ),
-    );
-  }
-
-  ///Handling mode random spinning
-  Future<void> _handleSpinByRandomPressed() async {
-    if (!_wheelAnimationController.isAnimating) {
-      //Random hệ số thập phân từ 0 đến 1
-      double randomDouble = Random().nextDouble();
-      //random theo số phần tử
-      int randomLength = Random().nextInt(widget.wheel.items.length);
-      _angle =
-          (randomDouble + widget.wheel.rotationCount + randomLength) * 2 * pi;
-      await Future.microtask(() => widget.onAnimationStart?.call());
-      await _wheelAnimationController.forward(from: 0.0).then((_) {
-        double factor = _currentAngle / (2 * pi);
-        factor += _angle / (2 * pi);
-        factor %= 1;
-        _currentAngle = factor * 2 * pi;
-        widget.onResult.call(widget.wheel.items[_indexResult]);
-        _wheelAnimationController.reset();
-      });
-      await Future.microtask(() => widget.onAnimationEnd?.call());
-    }
-  }
+  // Widget _buildButtonSpin() {
+  //   return Visibility(
+  //     visible: !_wheelAnimationController.isAnimating,
+  //     child: widget.wheel.action ??
+  //         TextButton(
+  //           onPressed: _handleSpinByPriorityPressed,
+  //           style: widget.wheel.spinButtonStyle ??
+  //               TextButton.styleFrom(
+  //                 backgroundColor: Colors.black.withOpacity(0.4),
+  //               ),
+  //           child: widget.wheel.childSpinButton ??
+  //               Text(
+  //                 widget.wheel.titleSpinButton ?? 'Click here to spin',
+  //                 style: const TextStyle(fontSize: 16, color: Colors.white),
+  //               ),
+  //         ),
+  //   );
+  // }
 
   ///Handling the calculation of the index value of the element while spinning
   int _getIndexFortune(double value) {

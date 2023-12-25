@@ -12,7 +12,7 @@ class FortuneWheelBackground extends StatefulWidget {
       {Key? key,
       required this.painterController,
       required this.child,
-      this.backgroundColor = const Color(0xff198827),
+      this.backgroundColor = Colors.white,
       this.duration = const Duration(milliseconds: 5000)})
       : super(key: key);
 
@@ -77,8 +77,8 @@ class _FortuneWheelBackgroundState extends State<FortuneWheelBackground>
         painter: _BackgroundPainter(
           painterController: _painterController,
           rotateAngle: _rotation.value,
-          anglePerTriangle: 10,
-          numberTriangle: 15,
+          anglePerTriangle: 100,
+          numberTriangle: 10,
         ),
         child: widget.child,
       ),
@@ -113,7 +113,7 @@ class _BackgroundPainter extends CustomPainter {
       this.rotateAngle = 0,
       required this.painterController}) {
     painter = Paint()
-      ..color = Colors.purpleAccent
+      ..color = Colors.blue
       ..style = PaintingStyle.fill;
   }
 

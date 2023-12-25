@@ -7,10 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
 import 'package:flutter_fortune_wheel_example/common/constants.dart';
 import 'package:flutter_fortune_wheel_example/common/theme.dart';
-import 'package:flutter_fortune_wheel_example/pages/fortune_wheel_history_page.dart';
-import 'package:flutter_fortune_wheel_example/pages/fortune_wheel_setting_page.dart';
 import 'package:flutter_fortune_wheel_example/widgets/fortune_wheel_background.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:lottie/lottie.dart';
 
 void main() {
@@ -45,12 +42,8 @@ class _MyAppState extends State<MyApp> {
   final BackgroundPainterController _painterController =
       BackgroundPainterController();
 
-  late ConfettiController _confettiController;
-
-  Wheel _wheel = Wheel(
-    // items: Constants.icons2,
-    // items: Constants.liXiNamMoi,
-    items: Constants.list12Item,
+  final Wheel _wheel = Wheel(
+    items: Constants.icons,
     isSpinByPriority: true,
     duration: const Duration(seconds: 10),
   );
@@ -59,8 +52,6 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _painterController.playAnimation();
-    _confettiController =
-        ConfettiController(duration: const Duration(seconds: 10));
   }
 
   @override
@@ -68,7 +59,6 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
     _resultWheelController.close();
     _fortuneWheelController.close();
-    _confettiController.dispose();
   }
 
   @override
@@ -86,8 +76,10 @@ class _MyAppState extends State<MyApp> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _buildHeader(),
-                _buildResultIsChange(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: _buildResultIsChange(),
+                ),
               ],
             ),
           ),
@@ -96,85 +88,26 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Widget _buildHeader() {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.only(right: 8, left: 16),
-        child: Row(
-          children: [
-            SvgPicture.asset(
-              'assets/icons/fortune_wheel_icon.svg',
-              height: 24,
-              width: 24,
-            ),
-            const SizedBox(width: 16),
-            const Text(
-              'Wheel of Fortune',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-              ),
-            ),
-            const Spacer(),
-            IconButton(
-              splashRadius: 28,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FortuneWheelHistoryPage(
-                      resultsHistory: _resultsHistory,
-                    ),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.bar_chart, color: Colors.white),
-            ),
-            IconButton(
-              splashRadius: 28,
-              onPressed: () async {
-                _fortuneWheelController.add(false);
-                final Wheel? result = await Navigator.push(
-                  context,
-                  MaterialPageRoute<Wheel>(
-                    builder: (context) =>
-                        FortuneWheelSettingPage(wheel: _wheel),
-                  ),
-                );
-                if (result != null) {
-                  _wheel = result;
-                  _painterController.playAnimation();
-                }
-                _resultWheelController.sink.add(_wheel.items[0]);
-                _fortuneWheelController.add(true);
-              },
-              icon: const Icon(Icons.settings, color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildFortuneWheel() {
     return Center(
-      child: StreamBuilder<bool>(
-        stream: _fortuneWheelController.stream,
-        builder: (context, snapshot) {
-          if (snapshot.data == false) {
-            return const SizedBox.shrink();
-          }
-          return FortuneWheel(
-            key: const ValueKey<String>('ValueKeyFortunerWheel'),
-            wheel: _wheel,
-            onChanged: (Fortune item) {
-              _resultWheelController.sink.add(item);
-            },
-            onResult: _onResult,
-          );
-        },
-      ),
-    );
+        child:
+            //// StreamBuilder<bool>(
+            //   stream: _fortuneWheelController.stream,
+            //   builder: (context, snapshot) {
+            //     if (snapshot.data == false) {
+            //       return const SizedBox.shrink();
+            //     }
+            FortuneWheel(
+      key: const ValueKey<String>('ValueKeyFortunerWheel'),
+      wheel: _wheel,
+      onChanged: (Fortune item) {
+        _resultWheelController.sink.add(item);
+      },
+      onResult: _onResult,
+    )
+        //   },
+        // ),
+        );
   }
 
   Future<void> _onResult(Fortune item) async {
@@ -190,26 +123,6 @@ class _MyAppState extends State<MyApp> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Align(
-              //   alignment: Alignment.center,
-              //   child: ConfettiWidget(
-              //     confettiController: _confettiController,
-              //     blastDirectionality: BlastDirectionality.explosive,
-              //     // don't specify a direction, blast randomly
-              //     // shouldLoop: true,
-              //     // start again as soon as the animation is finished
-              //     colors: const [
-              //       Colors.green,
-              //       Colors.blue,
-              //       Colors.pink,
-              //       Colors.orange,
-              //       Colors.purple,
-              //       Colors.yellowAccent,
-              //     ],
-              //     // manually specify the colors to be used
-              //     createParticlePath: _drawStar, // define a custom shape/path.
-              //   ),
-              // ),
               Container(
                 padding: const EdgeInsets.only(top: 20),
                 height: 200,
@@ -266,7 +179,6 @@ class _MyAppState extends State<MyApp> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    _confettiController.stop();
                     Navigator.pop(context);
                     _painterController.playAnimation();
                   },
